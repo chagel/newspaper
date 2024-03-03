@@ -78,6 +78,10 @@ class Configuration(object):
         # TODO: Actually make this work
         # self.use_cached_categories = True
 
+        # SSL verification, set to False if you don't want to verify SSL, 
+        # or set to the path to a CA_BUNDLE file
+        self.verify = True 
+
     def get_language(self):
         return self._language
 

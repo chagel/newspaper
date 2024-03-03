@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 FAIL_ENCODING = 'ISO-8859-1'
 
 
-def get_request_kwargs(timeout, useragent, proxies, headers):
+def get_request_kwargs(timeout, useragent, proxies, headers, verify):
     """This Wrapper method exists b/c some values in req_kwargs dict
     are methods which need to be called every time we make a request
     """
@@ -30,7 +30,8 @@ def get_request_kwargs(timeout, useragent, proxies, headers):
         'cookies': cj(),
         'timeout': timeout,
         'allow_redirects': True,
-        'proxies': proxies
+        'proxies': proxies,
+        'verify': verify
     }
 
 
@@ -55,12 +56,13 @@ def get_html_2XX_only(url, config=None, response=None):
     timeout = config.request_timeout
     proxies = config.proxies
     headers = config.headers
+    verify = config.verify
 
     if response is not None:
         return _get_html_from_response(response, config)
 
     response = requests.get(
-        url=url, **get_request_kwargs(timeout, useragent, proxies, headers))
+        url=url, **get_request_kwargs(timeout, useragent, proxies, headers, verify))
 
     html = _get_html_from_response(response, config)
 
@@ -102,12 +104,13 @@ class MRequest(object):
         self.timeout = config.request_timeout
         self.proxies = config.proxies
         self.headers = config.headers
+        self.verify = config.verify
         self.resp = None
 
     def send(self):
         try:
             self.resp = requests.get(self.url, **get_request_kwargs(
-                self.timeout, self.useragent, self.proxies, self.headers))
+                self.timeout, self.useragent, self.proxies, self.headers, self.verify))
             if self.config.http_success_only:
                 self.resp.raise_for_status()
         except requests.exceptions.RequestException as e:
